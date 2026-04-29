@@ -21,7 +21,7 @@ t := 5*One(R);
 n := 4;
 
 # logfile name encodes (n, p, q, t)
-LogTo(Concatenation("logfile_bmw_trunc","-", String(n), "-(", pStr, ")-",
+LogTo(Concatenation("../logs_and_traces/logfile_bmw_trunc","-", String(n), "-(", pStr, ")-",
                     String(Int(q)), "-", String(Int(t)), ".txt"));
 
 
