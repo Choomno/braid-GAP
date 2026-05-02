@@ -29,7 +29,7 @@ t_int := 7;
 
 # Below is a parameter that determines whether to compute the full trace
 # (for instance, for the purpose of expressing each basis element as a
-# combination of the input relations) or just the bare Grobner basis.
+# combination of the input relations) or just a bare Grobner basis.
 # Tracing is dramatically heavier in time, RAM, and disk. Set either
 #   traced := true
 #   traced := false
@@ -193,9 +193,7 @@ od;
 # The four invertibility relations already form a Grobner basis on their own
 # (their leading monomials don't overlap; all S-polys reduce to zero), so we can
 # use them directly in StrongNormalFormNP without an SGrobner call. Reducing
-# kills internal x_i*y_i and y_i*x_i adjacencies. The ideal is unchanged: each
-# simplified poly equals the original plus a multiple of an invertibility
-# relation.
+# kills x_i*y_i and y_i*x_i instances.
 inv_GB := GP2NPList(inv_relations);
 complex_np := GP2NPList(complex_relations);
 complex_simplified := List(complex_np, p -> StrongNormalFormNP(p, inv_GB));

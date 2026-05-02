@@ -1,0 +1,235 @@
+Original relations (GAP):
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*x1*y1
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*y1*x1
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*x2*y2
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*y2*x2
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*x3*y3
+(ZmodpZObj( 2147483646, 2147483647 ))*<identity ...>+(ZmodpZObj( 1, 2147483647 ))*y3*x3
+(ZmodpZObj( 1, 2147483647 ))*x1*x2*x1+(ZmodpZObj( 2147483646, 2147483647 ))*x2*x1*x2
+(ZmodpZObj( 1, 2147483647 ))*y1*y2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*y2*y1*y2
+(ZmodpZObj( 1, 2147483647 ))*x1*x3+(ZmodpZObj( 2147483646, 2147483647 ))*x3*x1
+(ZmodpZObj( 1, 2147483647 ))*y1*y3+(ZmodpZObj( 2147483646, 2147483647 ))*y3*y1
+(ZmodpZObj( 2147483646, 2147483647 ))*x3*y1+(ZmodpZObj( 1, 2147483647 ))*y1*x3
+(ZmodpZObj( 1, 2147483647 ))*x1*y3+(ZmodpZObj( 2147483646, 2147483647 ))*y3*x1
+(ZmodpZObj( 1, 2147483647 ))*x2*x3*x2+(ZmodpZObj( 2147483646, 2147483647 ))*x3*x2*x3
+(ZmodpZObj( 1, 2147483647 ))*y2*y3*y2+(ZmodpZObj( 2147483646, 2147483647 ))*y3*y2*y3
+(ZmodpZObj( 1, 2147483647 ))*x1*x2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*y2*x1*x2
+(ZmodpZObj( 2147483646, 2147483647 ))*x2*y1*y2+(ZmodpZObj( 1, 2147483647 ))*y1*y2*x1
+(ZmodpZObj( 1, 2147483647 ))*x1*y2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*y2*y1*x2
+(ZmodpZObj( 2147483646, 2147483647 ))*x2*x1*y2+(ZmodpZObj( 1, 2147483647 ))*y1*x2*x1
+(ZmodpZObj( 1, 2147483647 ))*x2*x3*y2+(ZmodpZObj( 2147483646, 2147483647 ))*y3*x2*x3
+(ZmodpZObj( 2147483646, 2147483647 ))*x3*y2*y3+(ZmodpZObj( 1, 2147483647 ))*y2*y3*x2
+(ZmodpZObj( 1, 2147483647 ))*x2*y3*y2+(ZmodpZObj( 2147483646, 2147483647 ))*y3*y2*x3
+(ZmodpZObj( 2147483646, 2147483647 ))*x3*x2*y3+(ZmodpZObj( 1, 2147483647 ))*y2*x3*x2
+(ZmodpZObj( 16, 2147483647 ))*<identity ...>+(ZmodpZObj( 4, 2147483647 ))*x1+(ZmodpZObj( 4, 2147483647 ))*x2+(ZmodpZObj( 2147483627, 2147483647 ))*y1+(ZmodpZObj( 2147483627, 
+2147483647 ))*y2+(ZmodpZObj( 2147483643, 2147483647 ))*x1*x2+(ZmodpZObj( 1, 2147483647 ))*x2*x1+(ZmodpZObj( 2147483642, 2147483647 ))*x2*y1+(ZmodpZObj( 20, 2147483647 ))*y1*y2+(ZmodpZObj( 
+2147483642, 2147483647 ))*y2*x1+(ZmodpZObj( 25, 2147483647 ))*y2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*x1*x2*x1+(ZmodpZObj( 5, 2147483647 ))*x1*x2*y1+(ZmodpZObj( 5, 
+2147483647 ))*y1*y2*x1+(ZmodpZObj( 2147483622, 2147483647 ))*y1*y2*y1
+(ZmodpZObj( 16, 2147483647 ))*<identity ...>+(ZmodpZObj( 4, 2147483647 ))*x2+(ZmodpZObj( 4, 2147483647 ))*x3+(ZmodpZObj( 2147483627, 2147483647 ))*y2+(ZmodpZObj( 2147483627, 
+2147483647 ))*y3+(ZmodpZObj( 2147483643, 2147483647 ))*x2*x3+(ZmodpZObj( 1, 2147483647 ))*x3*x2+(ZmodpZObj( 2147483642, 2147483647 ))*x3*y2+(ZmodpZObj( 20, 2147483647 ))*y2*y3+(ZmodpZObj( 
+2147483642, 2147483647 ))*y3*x2+(ZmodpZObj( 25, 2147483647 ))*y3*y2+(ZmodpZObj( 2147483646, 2147483647 ))*x2*x3*x2+(ZmodpZObj( 5, 2147483647 ))*x2*x3*y2+(ZmodpZObj( 5, 
+2147483647 ))*y2*y3*x2+(ZmodpZObj( 2147483622, 2147483647 ))*y2*y3*y2
+(ZmodpZObj( 2147483643, 2147483647 ))*x2*x3*x1*x2+(ZmodpZObj( 100, 2147483647 ))*x2*x3*y1*y2+(ZmodpZObj( 100, 2147483647 ))*y2*y3*x1*x2+(ZmodpZObj( 2147481147, 
+2147483647 ))*y2*y3*y1*y2+(ZmodpZObj( 4, 2147483647 ))*x1*x2*x3*x1*x2+(ZmodpZObj( 2147483547, 2147483647 ))*x1*x2*x3*y1*y2+(ZmodpZObj( 2147483646, 2147483647 ))*x2*x3*x1*x2*x1+(ZmodpZObj( 5, 
+2147483647 ))*x2*x3*x1*x2*y1+(ZmodpZObj( 25, 2147483647 ))*x2*x3*y1*y2*x1+(ZmodpZObj( 2147483522, 2147483647 ))*x2*x3*y1*y2*y1+(ZmodpZObj( 2147483547, 2147483647 ))*y1*y2*y3*x1*x2+(ZmodpZObj( 
+2500, 2147483647 ))*y1*y2*y3*y1*y2+(ZmodpZObj( 25, 2147483647 ))*y2*y3*x1*x2*x1+(ZmodpZObj( 2147483522, 2147483647 ))*y2*y3*x1*x2*y1+(ZmodpZObj( 2147483022, 
+2147483647 ))*y2*y3*y1*y2*x1+(ZmodpZObj( 3125, 2147483647 ))*y2*y3*y1*y2*y1+(ZmodpZObj( 1, 2147483647 ))*x1*x2*x3*x1*x2*x1+(ZmodpZObj( 2147483642, 2147483647 ))*x1*x2*x3*x1*x2*y1+(ZmodpZObj( 
+2147483622, 2147483647 ))*x1*x2*x3*y1*y2*x1+(ZmodpZObj( 125, 2147483647 ))*x1*x2*x3*y1*y2*y1+(ZmodpZObj( 2147483622, 2147483647 ))*y1*y2*y3*x1*x2*x1+(ZmodpZObj( 125, 
+2147483647 ))*y1*y2*y3*x1*x2*y1+(ZmodpZObj( 625, 2147483647 ))*y1*y2*y3*y1*y2*x1+(ZmodpZObj( 2147480522, 2147483647 ))*y1*y2*y3*y1*y2*y1
+(ZmodpZObj( 28, 2147483647 ))*<identity ...>+(ZmodpZObj( 3, 2147483647 ))*x1+(ZmodpZObj( 2147483612, 2147483647 ))*y1+(ZmodpZObj( 2147483646, 2147483647 ))*x1^2+(ZmodpZObj( 5, 
+2147483647 ))*x1*y1
+(ZmodpZObj( 28, 2147483647 ))*<identity ...>+(ZmodpZObj( 3, 2147483647 ))*x2+(ZmodpZObj( 2147483612, 2147483647 ))*y2+(ZmodpZObj( 2147483646, 2147483647 ))*x2^2+(ZmodpZObj( 5, 
+2147483647 ))*x2*y2
+(ZmodpZObj( 28, 2147483647 ))*<identity ...>+(ZmodpZObj( 3, 2147483647 ))*x3+(ZmodpZObj( 2147483612, 2147483647 ))*y3+(ZmodpZObj( 2147483646, 2147483647 ))*x3^2+(ZmodpZObj( 5, 
+2147483647 ))*x3*y3
+(ZmodpZObj( 4, 2147483647 ))*x2*x1^2*x2+(ZmodpZObj( 2147483547, 2147483647 ))*x2*x1*y1*y2+(ZmodpZObj( 2147483547, 2147483647 ))*y2*y1*x1*x2+(ZmodpZObj( 2500, 
+2147483647 ))*y2*y1^2*y2+(ZmodpZObj( 1, 2147483647 ))*x2*x1^2*x2*x1+(ZmodpZObj( 2147483642, 2147483647 ))*x2*x1^2*x2*y1+(ZmodpZObj( 2147483622, 2147483647 ))*x2*x1*y1*y2*x1+(ZmodpZObj( 125, 
+2147483647 ))*x2*x1*y1*y2*y1+(ZmodpZObj( 2147483622, 2147483647 ))*y2*y1*x1*x2*x1+(ZmodpZObj( 125, 2147483647 ))*y2*y1*x1*x2*y1+(ZmodpZObj( 625, 2147483647 ))*y2*y1^2*y2*x1+(ZmodpZObj( 
+2147480522, 2147483647 ))*y2*y1^2*y2*y1
+(ZmodpZObj( 4, 2147483647 ))*x3*x2^2*x3+(ZmodpZObj( 2147483547, 2147483647 ))*x3*x2*y2*y3+(ZmodpZObj( 2147483547, 2147483647 ))*y3*y2*x2*x3+(ZmodpZObj( 2500, 
+2147483647 ))*y3*y2^2*y3+(ZmodpZObj( 1, 2147483647 ))*x3*x2^2*x3*x2+(ZmodpZObj( 2147483642, 2147483647 ))*x3*x2^2*x3*y2+(ZmodpZObj( 2147483622, 2147483647 ))*x3*x2*y2*y3*x2+(ZmodpZObj( 125, 
+2147483647 ))*x3*x2*y2*y3*y2+(ZmodpZObj( 2147483622, 2147483647 ))*y3*y2*x2*x3*x2+(ZmodpZObj( 125, 2147483647 ))*y3*y2*x2*x3*y2+(ZmodpZObj( 625, 2147483647 ))*y3*y2^2*y3*x2+(ZmodpZObj( 
+2147480522, 2147483647 ))*y3*y2^2*y3*y2
+(ZmodpZObj( 2147483643, 2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2+(ZmodpZObj( 100, 2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2+(ZmodpZObj( 500, 2147483647 ))*x3*x2*x1*y1*y2*y3*x1*x2+(ZmodpZObj( 
+2147471147, 2147483647 ))*x3*x2*x1*y1*y2*y3*y1*y2+(ZmodpZObj( 500, 2147483647 ))*y3*y2*y1*x1*x2*x3*x1*x2+(ZmodpZObj( 2147471147, 2147483647 ))*y3*y2*y1*x1*x2*x3*y1*y2+(ZmodpZObj( 2147421147, 
+2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2+(ZmodpZObj( 1562500, 2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2+(ZmodpZObj( 2147483646, 2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2*x1+(ZmodpZObj( 5, 
+2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2*y1+(ZmodpZObj( 25, 2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2*x1+(ZmodpZObj( 2147483522, 2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2*y1+(ZmodpZObj( 125, 
+2147483647 ))*x3*x2*x1*y1*y2*y3*x1*x2*x1+(ZmodpZObj( 2147483022, 2147483647 ))*x3*x2*x1*y1*y2*y3*x1*x2*y1+(ZmodpZObj( 2147480522, 2147483647 ))*x3*x2*x1*y1*y2*y3*y1*y2*x1+(ZmodpZObj( 15625, 
+2147483647 ))*x3*x2*x1*y1*y2*y3*y1*y2*y1+(ZmodpZObj( 125, 2147483647 ))*y3*y2*y1*x1*x2*x3*x1*x2*x1+(ZmodpZObj( 2147483022, 2147483647 ))*y3*y2*y1*x1*x2*x3*x1*x2*y1+(ZmodpZObj( 2147480522, 
+2147483647 ))*y3*y2*y1*x1*x2*x3*y1*y2*x1+(ZmodpZObj( 15625, 2147483647 ))*y3*y2*y1*x1*x2*x3*y1*y2*y1+(ZmodpZObj( 2147468022, 2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2*x1+(ZmodpZObj( 78125, 
+2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2*y1+(ZmodpZObj( 390625, 2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2*x1+(ZmodpZObj( 2145530522, 2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2*y1
+Simplified complex relations (post-reduction mod invertibility):
+(ZmodpZObj( 2147483622, 2147483647 ))*y1*y2*y1+(ZmodpZObj( 5, 2147483647 ))*y1*y2*x1+(ZmodpZObj( 5, 2147483647 ))*x1*x2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*x1*x2*x1+(ZmodpZObj( 25, 
+2147483647 ))*y2*y1+(ZmodpZObj( 2147483642, 2147483647 ))*y2*x1+(ZmodpZObj( 20, 2147483647 ))*y1*y2+(ZmodpZObj( 2147483642, 2147483647 ))*x2*y1+(ZmodpZObj( 1, 2147483647 ))*x2*x1+(ZmodpZObj( 
+2147483643, 2147483647 ))*x1*x2+(ZmodpZObj( 2147483627, 2147483647 ))*y2+(ZmodpZObj( 2147483627, 2147483647 ))*y1+(ZmodpZObj( 4, 2147483647 ))*x2+(ZmodpZObj( 4, 2147483647 ))*x1+(ZmodpZObj( 
+16, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147483622, 2147483647 ))*y2*y3*y2+(ZmodpZObj( 5, 2147483647 ))*y2*y3*x2+(ZmodpZObj( 5, 2147483647 ))*x2*x3*y2+(ZmodpZObj( 2147483646, 2147483647 ))*x2*x3*x2+(ZmodpZObj( 25, 
+2147483647 ))*y3*y2+(ZmodpZObj( 2147483642, 2147483647 ))*y3*x2+(ZmodpZObj( 20, 2147483647 ))*y2*y3+(ZmodpZObj( 2147483642, 2147483647 ))*x3*y2+(ZmodpZObj( 1, 2147483647 ))*x3*x2+(ZmodpZObj( 
+2147483643, 2147483647 ))*x2*x3+(ZmodpZObj( 2147483627, 2147483647 ))*y3+(ZmodpZObj( 2147483627, 2147483647 ))*y2+(ZmodpZObj( 4, 2147483647 ))*x3+(ZmodpZObj( 4, 2147483647 ))*x2+(ZmodpZObj( 
+16, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147480522, 2147483647 ))*y1*y2*y3*y1*y2*y1+(ZmodpZObj( 625, 2147483647 ))*y1*y2*y3*y1*y2*x1+(ZmodpZObj( 125, 2147483647 ))*y1*y2*y3*x1*x2*y1+(ZmodpZObj( 2147483622, 
+2147483647 ))*y1*y2*y3*x1*x2*x1+(ZmodpZObj( 125, 2147483647 ))*x1*x2*x3*y1*y2*y1+(ZmodpZObj( 2147483622, 2147483647 ))*x1*x2*x3*y1*y2*x1+(ZmodpZObj( 2147483642, 
+2147483647 ))*x1*x2*x3*x1*x2*y1+(ZmodpZObj( 1, 2147483647 ))*x1*x2*x3*x1*x2*x1+(ZmodpZObj( 3125, 2147483647 ))*y2*y3*y1*y2*y1+(ZmodpZObj( 2147483022, 2147483647 ))*y2*y3*y1*y2*x1+(ZmodpZObj( 
+2147483522, 2147483647 ))*y2*y3*x1*x2*y1+(ZmodpZObj( 25, 2147483647 ))*y2*y3*x1*x2*x1+(ZmodpZObj( 2500, 2147483647 ))*y1*y2*y3*y1*y2+(ZmodpZObj( 2147483547, 
+2147483647 ))*y1*y2*y3*x1*x2+(ZmodpZObj( 2147483522, 2147483647 ))*x2*x3*y1*y2*y1+(ZmodpZObj( 25, 2147483647 ))*x2*x3*y1*y2*x1+(ZmodpZObj( 5, 2147483647 ))*x2*x3*x1*x2*y1+(ZmodpZObj( 
+2147483646, 2147483647 ))*x2*x3*x1*x2*x1+(ZmodpZObj( 2147483547, 2147483647 ))*x1*x2*x3*y1*y2+(ZmodpZObj( 4, 2147483647 ))*x1*x2*x3*x1*x2+(ZmodpZObj( 2147481147, 
+2147483647 ))*y2*y3*y1*y2+(ZmodpZObj( 100, 2147483647 ))*y2*y3*x1*x2+(ZmodpZObj( 100, 2147483647 ))*x2*x3*y1*y2+(ZmodpZObj( 2147483643, 2147483647 ))*x2*x3*x1*x2
+(ZmodpZObj( 2147483646, 2147483647 ))*x1^2+(ZmodpZObj( 2147483612, 2147483647 ))*y1+(ZmodpZObj( 3, 2147483647 ))*x1+(ZmodpZObj( 33, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147483646, 2147483647 ))*x2^2+(ZmodpZObj( 2147483612, 2147483647 ))*y2+(ZmodpZObj( 3, 2147483647 ))*x2+(ZmodpZObj( 33, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147483646, 2147483647 ))*x3^2+(ZmodpZObj( 2147483612, 2147483647 ))*y3+(ZmodpZObj( 3, 2147483647 ))*x3+(ZmodpZObj( 33, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147480522, 2147483647 ))*y2*y1^2*y2*y1+(ZmodpZObj( 625, 2147483647 ))*y2*y1^2*y2*x1+(ZmodpZObj( 2147483642, 2147483647 ))*x2*x1^2*x2*y1+(ZmodpZObj( 1, 
+2147483647 ))*x2*x1^2*x2*x1+(ZmodpZObj( 2500, 2147483647 ))*y2*y1^2*y2+(ZmodpZObj( 4, 2147483647 ))*x2*x1^2*x2+(ZmodpZObj( 250, 2147483647 ))*y1+(ZmodpZObj( 2147483597, 
+2147483647 ))*x1+(ZmodpZObj( 2147483447, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2147480522, 2147483647 ))*y3*y2^2*y3*y2+(ZmodpZObj( 625, 2147483647 ))*y3*y2^2*y3*x2+(ZmodpZObj( 2147483642, 2147483647 ))*x3*x2^2*x3*y2+(ZmodpZObj( 1, 
+2147483647 ))*x3*x2^2*x3*x2+(ZmodpZObj( 2500, 2147483647 ))*y3*y2^2*y3+(ZmodpZObj( 4, 2147483647 ))*x3*x2^2*x3+(ZmodpZObj( 250, 2147483647 ))*y2+(ZmodpZObj( 2147483597, 
+2147483647 ))*x2+(ZmodpZObj( 2147483447, 2147483647 ))*<identity ...>
+(ZmodpZObj( 2145530522, 2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2*y1+(ZmodpZObj( 390625, 2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2*x1+(ZmodpZObj( 78125, 
+2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2*y1+(ZmodpZObj( 2147468022, 2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2*x1+(ZmodpZObj( 2147483522, 2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2*y1+(ZmodpZObj( 25, 
+2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2*x1+(ZmodpZObj( 5, 2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2*y1+(ZmodpZObj( 2147483646, 2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2*x1+(ZmodpZObj( 1562500, 
+2147483647 ))*y3*y2*y1^2*y2*y3*y1*y2+(ZmodpZObj( 2147421147, 2147483647 ))*y3*y2*y1^2*y2*y3*x1*x2+(ZmodpZObj( 100, 2147483647 ))*x3*x2*x1^2*x2*x3*y1*y2+(ZmodpZObj( 2147483643, 
+2147483647 ))*x3*x2*x1^2*x2*x3*x1*x2+(ZmodpZObj( 31250, 2147483647 ))*y1*y2*y1+(ZmodpZObj( 2147477397, 2147483647 ))*y1*y2*x1+(ZmodpZObj( 2147482397, 2147483647 ))*x1*x2*y1+(ZmodpZObj( 250, 
+2147483647 ))*x1*x2*x1+(ZmodpZObj( 2147458647, 2147483647 ))*y1*y2+(ZmodpZObj( 1000, 2147483647 ))*x1*x2
+Total input relations: 31
+Untraced option selected.
+Beginning SGrobner calculation (no trace).
+#I  number of entered polynomials is 31
+#I  number of polynomials after reduction is 31
+#I  End of phase I
+#I  End of phase II
+#I  length of G =32
+#I  length of todo is 75
+#I  length of G =33
+#I  length of todo is 74
+#I  length of G =34
+#I  length of todo is 73
+#I  length of G =35
+#I  length of todo is 74
+#I  length of G =36
+#I  length of todo is 74
+#I  length of G =37
+#I  length of todo is 75
+#I  length of G =38
+#I  length of todo is 80
+#I  length of G =39
+#I  length of todo is 53
+#I  length of G =39
+#I  length of todo is 52
+#I  length of G =40
+#I  length of todo is 51
+#I  length of G =41
+#I  length of todo is 50
+#I  length of G =42
+#I  length of todo is 49
+#I  length of G =43
+#I  length of todo is 48
+#I  length of G =43
+#I  length of todo is 47
+#I  length of G =44
+#I  length of todo is 46
+#I  length of G =45
+#I  length of todo is 45
+#I  length of G =46
+#I  length of todo is 44
+#I  length of G =47
+#I  length of todo is 43
+#I  length of G =48
+#I  length of todo is 42
+#I  length of G =49
+#I  length of todo is 41
+#I  length of G =50
+#I  length of todo is 40
+#I  length of G =50
+#I  length of todo is 39
+#I  length of G =51
+#I  length of todo is 38
+#I  length of G =52
+#I  length of todo is 37
+#I  length of G =53
+#I  length of todo is 36
+#I  length of G =54
+#I  length of todo is 35
+#I  length of G =55
+#I  length of todo is 34
+#I  length of G =56
+#I  length of todo is 33
+#I  length of G =57
+#I  length of todo is 32
+#I  length of G =58
+#I  length of todo is 31
+#I  length of G =59
+#I  length of todo is 30
+#I  length of G =60
+#I  length of todo is 29
+#I  length of G =61
+#I  length of todo is 28
+#I  length of G =62
+#I  length of todo is 27
+#I  length of G =63
+#I  length of todo is 26
+#I  length of G =64
+#I  length of todo is 25
+#I  length of G =65
+#I  length of todo is 24
+#I  length of G =66
+#I  length of todo is 23
+#I  length of G =67
+#I  length of todo is 22
+#I  length of G =68
+#I  length of todo is 21
+#I  length of G =69
+#I  length of todo is 20
+#I  length of G =70
+#I  length of todo is 19
+#I  length of G =71
+#I  length of todo is 18
+#I  length of G =72
+#I  length of todo is 17
+#I  length of G =73
+#I  length of todo is 16
+#I  length of G =74
+#I  length of todo is 15
+#I  length of G =75
+#I  length of todo is 14
+#I  length of G =76
+#I  length of todo is 13
+#I  length of G =77
+#I  length of todo is 12
+#I  length of G =78
+#I  length of todo is 11
+#I  length of G =79
+#I  length of todo is 10
+#I  length of G =80
+#I  length of todo is 9
+#I  length of G =81
+#I  length of todo is 8
+#I  length of G =82
+#I  length of todo is 7
+#I  length of G =83
+#I  length of todo is 6
+#I  length of G =84
+#I  length of todo is 5
+#I  length of G =85
+#I  length of todo is 4
+#I  length of G =86
+#I  length of todo is 3
+#I  length of G =87
+#I  length of todo is 2
+#I  length of G =88
+#I  length of todo is 1
+#I  length of G =89
+#I  length of todo is 0
+#I  List of todo lengths is [ 80, 75, 74, 73, 74, 74, 75, 80, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 ]
+#I  End of phase III
+#I  G: Cleaning finished, 52 polynomials reduced
+#I  Time needed to clean G :42
+#I  End of phase IV
+#I  The computation took 5189640 msecs.
+Groebner basis size: 89
+The quotient algebra is finite-dimensional.
+The Gel'fand-Kirillov dimension is: 0
+Hilbert series (degree 0,...,6): [ 1, 6, 20, 36, 30, 10, 2 ]
+Cumulative dims: [ 1, 7, 27, 63, 93, 103, 105 ]
+#I  The computation took 1 msecs.
+Quotient algebra dimension DimQA(B, 6) = 105
+Compare: dim BMW_4 = (2n-1)!! = 105
+gap> 
