@@ -13,7 +13,7 @@ SetRecursionTrapInterval(50000);
 # from the braid-GAP/ directory.
 #
 # Number of strands.
-n := 4;
+n := 3;
 
 # The "true" coefficient ring is the function field Q(q,t), but rational
 # arithmetic is too expensive; specializing to GF(p) at chosen integer values is
@@ -21,29 +21,44 @@ n := 4;
 #
 # The coefficient ring is GF(p) for the prime p below; q and t are the residue
 # classes of q_int and t_int. Run at multiple primes/parameters to validate, or
-# for lifting to Q(q,t) via Chinese remainder theorem, rational reconstruction,
-# and and Pade interpolation.
+# for lifting coefficients to Q(q,t).
 pStr := "2^31-1";
 q_int := 5;
 t_int := 7;
 
+# Type of untwisting relations to add. The value is one of:
+#   "bigelow"        - Bigelow's conjectured form: 2-strand (xs[j] - t)X_2,
+#                      i-strand (reverse_x - q^(i-1)*reverse_y)X_i.
+#   "indeterminate"  - Same 2-strand relation as bigelow (eigenvalue t), but
+#                      the i-strand eigenvalue is s^(i-1) where
+#                      s = s_int*One(R) is an independent parameter. The
+#                      s_int parameter below is used only in this case.
+#   "none"           - Omit the untwisting relations entirely. Quotient may
+#                      potentially be infinite-dimensional in this case.
+untwisting_type := "bigelow";
+s_int := 11;
+
 # Below is a parameter that determines whether to compute the full trace
-# (for instance, for the purpose of expressing each basis element as a
+# (for instance, for the purpose of expressing each basis element as a linear
 # combination of the input relations) or just a bare Grobner basis.
-# Tracing is dramatically heavier in time, RAM, and disk. Set either
+# Tracing is dramatically heavier in time, RAM, and disk. Set either:
 #   traced := true
 #   traced := false
 traced := false;
 
+
 ###############################################################################
-# END USER PARAMETERS
+# END USER PARAMETERS, START AUXILIARY (read, ignoreable)
 ###############################################################################
 
-# Field parameters
-p := EvalString(pStr);
-R := GF(p);
-q := q_int * One(R);
-t := t_int * One(R);
+# Validate untwisting_type and throw error if invalid.
+if not (untwisting_type in [ "bigelow", "indeterminate", "none" ]) then
+  Error("invalid untwisting_type: \"", untwisting_type,
+        "\" (expected \"bigelow\", \"indeterminate\", or \"none\")");
+fi;
+
+# Set control flow for traced/untraced computation
+# and strings for output file name
 if traced then
   mode_str := "traced";
   out_str := "trace";
@@ -52,166 +67,363 @@ else
   out_str := "untraced";
 fi;
 
-# logfile name encodes (mode, n, p, q, t)
-LogTo(Concatenation("logs_and_traces/logfile_zipper-", mode_str, "-",
-                    String(n), "-(", pStr, ")-",
-                    String(Int(q)), "-", String(Int(t)), ".txt"));
+# Generate parameter suffix used in output filenames. For "indeterminate"
+# untwisting we have the additional s_int parameter; for "bigelow" and "none"
+# only (q,t) appear.
+if untwisting_type = "indeterminate" then
+  params_str := Concatenation(String(q_int), "-", String(t_int), "-",
+                              String(s_int));
+else
+  params_str := Concatenation(String(q_int), "-", String(t_int));
+fi;
+
+# logfile name encodes (mode, untwisting_type, n, p, params_str)
+LogTo(Concatenation("logs_and_traces/logfile_zipper_", untwisting_type, "-",
+                    mode_str, "-", String(n), "-(", pStr, ")-", params_str,
+                    ".txt"));
 
 
-# Define free associative algebra on 2*(n-1) variables
+###############################################################################
+# END AUXILIARY, START ALGEBRA PRESENTATION
+###############################################################################
+
+
+# Field parameters
+p := EvalString(pStr);
+R := GF(p);
+q := q_int * One(R);
+t := t_int * One(R);
+s := s_int * One(R);
+
+
+# Define generator names for a free associative algebra on 2*(n-1) variables
 # xs are generators, ys their inverses
 # Generator order: x1, x2, ..., x_{n-1}, y1, y2, ..., y_{n-1}.
-generators := Concatenation(
+generator_names := Concatenation(
     List([1..n-1], i -> Concatenation("x", String(i))),
     List([1..n-1], i -> Concatenation("y", String(i)))
 );
-F := FreeAssociativeAlgebraWithOne(R, generators);
+F := FreeAssociativeAlgebraWithOne(R, generator_names);
 generators := GeneratorsOfAlgebra(F);
 one := generators[1];
 xs := generators{[2..n]};;
 ys := generators{[n+1..2*n-1]};;
 
 
-# Define relations
-# Three groups, kept separate so that we can reduce the high-degree
-# zipper/untwist relations modulo the cheap invertibility ones before
-# handing them to SGrobnerTrace.
-inv_relations := [];          # x_i*y_i = 1, y_i*x_i = 1
-basic_relations := [];        # braid + far-commutativity (no x*y pairs)
-complex_relations := [];      # zipper + untwisting (contain x*y pairs)
+# build_relations: build the four relation groups in any coefficient ring.
+# Used for the GF(p) computation below and a second time over Q(q,t,s) for
+# printing the relations in human-readable format. 
+# Returns rec(inv, braid, zipper, untwisting) (GAP record data type).
+#
+# The relations are grouped so that we can reduce the high-degree zipper/untwist
+# relations modulo the invertibility ones before handing them to SGrobnerTrace,
+# and so that the display can label them.
+build_relations := function(one_, xs_, ys_, q_, t_, s_, untw)
+  local n_, inv, braid, zipper, untwisting, S, i, j, k,
+        yProd, xProd, yProd_after, xProd_after, yProd_full, xProd_full,
+        xProd_reverse, yProd_reverse;
+  n_ := Length(xs_) + 1;
+  inv := [];          # invertibility
+  braid := [];        # braid + far-commutativity (no x*y pairs)
+  zipper := [];       # zipper relations (contains x*y pairs)
+  untwisting := [];   # untwisting relations (contains x*y pairs)
 
 
-# Add invertibility relations
-for i in [1..n-1] do
-  Add(inv_relations, xs[i]*ys[i] - one);
-  Add(inv_relations, ys[i]*xs[i] - one);
-od;
+  # Add invertibility relations
+  for i in [1..n_-1] do
+    Add(inv, xs_[i]*ys_[i] - one_);
+    Add(inv, ys_[i]*xs_[i] - one_);
+  od;
 
 
-# Add far commutativity and braid relations
-# We include the y-braid and mixed versions explicitly: all derivable from the
-# x-braid relations + invertibility, but giving them upfront saves SGrobner from
-# rediscovering them via S-polynomial reductions.
-for i in [1..n-2] do
-  for j in [i+1..n-1] do
-    if j - i >= 2 then
-      Add(basic_relations, xs[i]*xs[j] - xs[j]*xs[i]);
-      Add(basic_relations, ys[i]*ys[j] - ys[j]*ys[i]);
-      Add(basic_relations, ys[i]*xs[j] - xs[j]*ys[i]);
-      Add(basic_relations, xs[i]*ys[j] - ys[j]*xs[i]);
-    else  # j = i+1
-      Add(basic_relations, xs[i]*xs[j]*xs[i] - xs[j]*xs[i]*xs[j]);
-      Add(basic_relations, ys[i]*ys[j]*ys[i] - ys[j]*ys[i]*ys[j]);
+  # Add far commutativity and braid relations
+  # We include the y-braid and mixed versions explicitly: all derivable from the
+  # x-braid relations + invertibility, but giving them upfront saves SGrobner from
+  # rediscovering them via S-polynomial reductions.
+  for i in [1..n_-2] do
+    for j in [i+1..n_-1] do
+      if j - i >= 2 then
+        Add(braid, xs_[i]*xs_[j] - xs_[j]*xs_[i]);
+        Add(braid, ys_[i]*ys_[j] - ys_[j]*ys_[i]);
+        Add(braid, ys_[i]*xs_[j] - xs_[j]*ys_[i]);
+        Add(braid, xs_[i]*ys_[j] - ys_[j]*xs_[i]);
+      else  # j = i+1
+        Add(braid, xs_[i]*xs_[j]*xs_[i] - xs_[j]*xs_[i]*xs_[j]);
+        Add(braid, ys_[i]*ys_[j]*ys_[i] - ys_[j]*ys_[i]*ys_[j]);
+      fi;
+    od;
+  od;
+
+
+  # Adds additional length-3 braid identities for adjacent strands.
+  # These are derivable from the x-braid + invertibility relations above, but
+  # without including them they show up as Grobner basis elements via long
+  # S-polynomial chains.
+  for i in [1..n_-2] do
+    Add(braid, xs_[i]*xs_[i+1]*ys_[i]   - ys_[i+1]*xs_[i]*xs_[i+1]);
+    Add(braid, ys_[i]*ys_[i+1]*xs_[i]   - xs_[i+1]*ys_[i]*ys_[i+1]);
+    Add(braid, xs_[i]*ys_[i+1]*ys_[i]   - ys_[i+1]*ys_[i]*xs_[i+1]);
+    Add(braid, ys_[i]*xs_[i+1]*xs_[i]   - xs_[i+1]*xs_[i]*ys_[i+1]);
+  od;
+
+
+  # Define sliders S[number of strands][anchor]
+  # The i-strand sliders have anchor index j ranging over [1..n-i+1].
+  S := List([1..n_], i -> []);
+  for j in [1..n_-1] do
+    S[2][j] := q_*ys_[j] + (1-q_)*one_ - xs_[j];
+  od;
+  for i in [3..n_] do
+    for j in [1..n_-i+1] do
+      yProd := ys_[j];
+      for k in [j+1..j+i-2] do yProd := yProd * ys_[k]; od;
+      xProd := xs_[j];
+      for k in [j+1..j+i-2] do xProd := xProd * xs_[k]; od;
+      S[i][j] := (q_^(i-1)*yProd - xProd) * S[i-1][j];
+    od;
+  od;
+
+
+  # Add zipper relations
+  # Note that zipper and untwisting relations for offset sliders (S[i][j],j > 1)
+  # can be derived from the S[i][1] ones via conjugation, but again, including
+  # them saves from rediscovery via long reductions.
+  # Zipper relations for 2-strand sliders
+  for j in [1..n_-2] do
+    Add(zipper,
+        (q_*ys_[j+1] + (1-q_)*one_ - xs_[j+1]
+         - q_*ys_[j]*ys_[j+1] + xs_[j]*xs_[j+1]) * S[2][j]);
+  od;
+
+  # Zipper relations for 3 or more strand sliders
+  # Since the zipper relation only applies if there is free strand to the right of
+  # a slider, j ranges in [1..n-i]
+  for i in [3..n_-1] do
+    for j in [1..n_-i] do
+      yProd_after := ys_[j+1];
+      for k in [j+2..j+i-1] do yProd_after := yProd_after * ys_[k]; od;
+      yProd_full := ys_[j] * yProd_after;
+      xProd_after := xs_[j+1];
+      for k in [j+2..j+i-1] do xProd_after := xProd_after * xs_[k]; od;
+      xProd_full := xs_[j] * xProd_after;
+      Add(zipper,
+          (q_^(i-1)*yProd_after - xProd_after
+           - q_^(i-1)*yProd_full + xProd_full) * S[i][j]);
+    od;
+  od;
+
+
+  # Add untwisting relations -- behavior controlled by untw.
+  if untw <> "none" then
+
+    # Untwisting relations for 2-strand sliders.
+    for j in [1..n_-1] do
+      Add(untwisting, (xs_[j] - t_*one_) * S[2][j]);
+    od;
+
+    # Untwisting relations for 3 or more strand sliders.
+    # An i-strand slider anchored at strand index j requires strands
+    # j, j+1, ..., j+i-2, so j ranges [1..n-i+1].
+    for i in [3..n_] do
+      for j in [1..n_-i+1] do
+        xProd_reverse := xs_[j+i-2];
+        yProd_reverse := ys_[j+i-2];
+        for k in [2..i-1] do
+          xProd_reverse := xProd_reverse * xs_[j+i-1-k];
+          yProd_reverse := yProd_reverse * ys_[j+i-1-k];
+        od;
+        if untw = "bigelow" then
+          Add(untwisting, (xProd_reverse - q_^(i-1)*yProd_reverse) * S[i][j]);
+        else  # indeterminate
+          Add(untwisting, (xProd_reverse - s_^(i-1)*yProd_reverse) * S[i][j]);
+        fi;
+      od;
+    od;
+
+  fi;
+
+  return rec(inv := inv, braid := braid,
+             zipper := zipper, untwisting := untwisting);
+end;
+
+
+# GF(p)-algebra presentation
+rels := build_relations(one, xs, ys, q, t, s, untwisting_type);
+inv_relations        := rels.inv;
+braid_relations      := rels.braid;
+zipper_relations     := rels.zipper;
+untwisting_relations := rels.untwisting;
+
+# Relations preprocessing: pre-reduce zipper / untwisting relations modulo
+# invertibility. The invertibility relations already form a Grobner basis on
+# their own (their leading monomials don't overlap; all S-polys reduce to zero),
+# so we can use them directly in StrongNormalFormNP without an SGrobner call.
+# Reducing kills x_i*y_i and y_i*x_i instances, reducing polynomial degree.
+# We drop any that reduced to zero (would mean the relation was already implied
+# by invertibility alone. This shouldn't happen, but we do it conservatively).
+inv_GB := GP2NPList(inv_relations);
+zipper_simplified := List(GP2NPList(zipper_relations),
+                          p -> StrongNormalFormNP(p, inv_GB));
+zipper_simplified := Filtered(zipper_simplified, p -> p <> []);
+untwisting_simplified := List(GP2NPList(untwisting_relations),
+                              p -> StrongNormalFormNP(p, inv_GB));
+untwisting_simplified := Filtered(untwisting_simplified, p -> p <> []);
+
+
+###############################################################################
+# END ALGEBRA PRESENTATION, START AUXILIARY II (read, also ignoreable)
+###############################################################################
+
+
+# Print a legend so the log opens with all the run parameters and the
+# convention used for the algebra's variable names.
+Print("=== zipper.gap run ===\n");
+Print("  n  = ", n, " strands\n");
+Print("  Coefficient ring : GF(", pStr, ")\n");
+Print("  q  = ", q_int, "\n");
+Print("  t  = ", t_int, "\n");
+if untwisting_type = "indeterminate" then
+  Print("  s  = ", s_int, "\n");
+fi;
+Print("  Untwisting type  : ", untwisting_type, "\n");
+Print("  Mode             : ", mode_str, "\n");
+Print("\n");
+Print("  Variable conventions:\n");
+Print("    x_i  =  sigma_i           (positive crossing on strand i)\n");
+Print("    y_i  =  sigma_i^{-1}      (negative crossing; y_i = x_i^{-1})\n");
+Print("    S[i][j]  =  X_{i,j}       (i-strand slider anchored at strand j)\n");
+Print("\n");
+
+
+# Display the input we're about to feed SGrobner, formatted symbolically.
+# We rebuild the same relations over the function field Q(q,t[,s]) and use a
+# small NP printer below to format them.
+if untwisting_type = "indeterminate" then
+  symR := FunctionField(Rationals, ["q", "t", "s"]);
+  sym_inds := IndeterminatesOfFunctionField(symR);
+  sym_q := sym_inds[1]; sym_t := sym_inds[2]; sym_s := sym_inds[3];
+else
+  symR := FunctionField(Rationals, ["q", "t"]);
+  sym_inds := IndeterminatesOfFunctionField(symR);
+  sym_q := sym_inds[1]; sym_t := sym_inds[2]; sym_s := Zero(symR);
+fi;
+symF := FreeAssociativeAlgebraWithOne(symR, generator_names);
+sym_gens := GeneratorsOfAlgebra(symF);
+sym_one := sym_gens[1];
+sym_xs := sym_gens{[2..n]};
+sym_ys := sym_gens{[n+1..2*n-1]};
+sym_rels := build_relations(sym_one, sym_xs, sym_ys,
+                            sym_q, sym_t, sym_s, untwisting_type);
+sym_inv_GB := GP2NPList(sym_rels.inv);
+sym_zipper_simpl := List(GP2NPList(sym_rels.zipper),
+                         p -> StrongNormalFormNP(p, sym_inv_GB));
+sym_zipper_simpl := Filtered(sym_zipper_simpl, p -> p <> []);
+sym_untwisting_simpl := List(GP2NPList(sym_rels.untwisting),
+                             p -> StrongNormalFormNP(p, sym_inv_GB));
+sym_untwisting_simpl := Filtered(sym_untwisting_simpl, p -> p <> []);
+
+# pretty_coeff_str: render a function-field element. Wrap in parens only if
+# the printed form has an inner +/- (i.e. it's a multi-term polynomial).
+pretty_coeff_str := function(c)
+  local s, i;
+  s := String(c);
+  for i in [2..Length(s)] do
+    if s[i] = '+' or s[i] = '-' then
+      return Concatenation("(", s, ")");
     fi;
   od;
-od;
+  return s;
+end;
 
-
-# Additional length-3 braid identities for adjacent strands.
-# These are derivable from the x-braid + invertibility relations above, but
-# without including them they show up as Grobner basis elements via long
-# S-polynomial chains.
-for i in [1..n-2] do
-  Add(basic_relations, xs[i]*xs[i+1]*ys[i]   - ys[i+1]*xs[i]*xs[i+1]);
-  Add(basic_relations, ys[i]*ys[i+1]*xs[i]   - xs[i+1]*ys[i]*ys[i+1]);
-  Add(basic_relations, xs[i]*ys[i+1]*ys[i]   - ys[i+1]*ys[i]*xs[i+1]);
-  Add(basic_relations, ys[i]*xs[i+1]*xs[i]   - xs[i+1]*xs[i]*ys[i+1]);
-od;
-
-
-# Define sliders S[number of strands][anchor]
-# The i-strand sliders have anchor index j ranging over [1..n-i+1].
-S := List([1..n], i -> []);
-for j in [1..n-1] do
-  S[2][j] := q*ys[j] + (1-q)*one - xs[j];
-od;
-for i in [3..n] do
-  for j in [1..n-i+1] do
-    yProd := ys[j];
-    for k in [j+1..j+i-2] do yProd := yProd * ys[k]; od;
-    xProd := xs[j];
-    for k in [j+1..j+i-2] do xProd := xProd * xs[k]; od;
-    S[i][j] := (q^(i-1)*yProd - xProd) * S[i-1][j];
-  od;
-od;
-
-
-# Add zipper relations
-# Zipper relations for 2-strand sliders
-for j in [1..n-2] do
-  Add(complex_relations,
-      (q*ys[j+1] + (1-q)*one - xs[j+1]
-       - q*ys[j]*ys[j+1] + xs[j]*xs[j+1]) * S[2][j]);
-od;
-
-# Zipper relations for 3 or more strand sliders
-# Since the zipper relation only applies if there is free strand to the right of
-# a slider, j ranges in [1..n-i]
-for i in [3..n-1] do
-  for j in [1..n-i] do
-    yProd_after := ys[j+1];
-    for k in [j+2..j+i-1] do yProd_after := yProd_after * ys[k]; od;
-    yProd_full := ys[j] * yProd_after;
-    xProd_after := xs[j+1];
-    for k in [j+2..j+i-1] do xProd_after := xProd_after * xs[k]; od;
-    xProd_full := xs[j] * xProd_after;
-    Add(complex_relations,
-        (q^(i-1)*yProd_after - xProd_after
-         - q^(i-1)*yProd_full + xProd_full) * S[i][j]);
-  od;
-od;
-
-
-# Add untwisting relations
-# Unzipping relations for 2-strand sliders
-for j in [1..n-1] do
-  Add(complex_relations, (xs[j] - t*one) * S[2][j]);
-od;
-
-# Unzipping relations for 3 or more strand sliders
-# An i-strand slider anchored at strand index j requires strands
-# j, j+1, ..., j+i-2, so j ranges [1..n-i+1].
-for i in [3..n] do
-  for j in [1..n-i+1] do
-    xProd_reverse := xs[j+i-2];
-    yProd_reverse := ys[j+i-2];
-    for k in [2..i-1] do
-      xProd_reverse := xProd_reverse * xs[j+i-1-k];
-      yProd_reverse := yProd_reverse * ys[j+i-1-k];
+# pretty_monomial_str: render a monomial (list of generator indices) using
+# x_i / y_i names with run-length compression for repeated factors.
+pretty_monomial_str := function(mon)
+  local parts, idx, count, name, i;
+  if Length(mon) = 0 then return ""; fi;
+  parts := [];
+  i := 1;
+  while i <= Length(mon) do
+    count := 1;
+    while i + count <= Length(mon) and mon[i + count] = mon[i] do
+      count := count + 1;
     od;
-    # Bigelow's conjectured untwisting relations
-    Add(complex_relations,
-        (xProd_reverse - q^(i-1)*yProd_reverse) * S[i][j]);
-
-    # indeterminate untwisting
-#   Add(complex_relations, (xProd_reverse - s*yProd_reverse) * S[i][j]);
+    idx := mon[i];
+    if idx <= n - 1 then
+      name := Concatenation("x", String(idx));
+    else
+      name := Concatenation("y", String(idx - (n - 1)));
+    fi;
+    if count > 1 then
+      Add(parts, Concatenation(name, "^", String(count)));
+    else
+      Add(parts, name);
+    fi;
+    i := i + count;
   od;
-od;
+  return JoinStringsWithSeparator(parts, "*");
+end;
 
+# pretty_print_np: print a symbolic NP polynomial as "term1 + term2 - term3 ...".
+# Folds the leading sign of each coefficient into the term separator so we get
+# "- q*x1" rather than "+ -q*x1".
+pretty_print_np := function(np)
+  local mons, coefs, i, cs, ms, term, first;
+  if np = [] then Print("0"); return; fi;
+  mons := np[1]; coefs := np[2];
+  first := true;
+  for i in [1..Length(mons)] do
+    cs := pretty_coeff_str(coefs[i]);
+    ms := pretty_monomial_str(mons[i]);
+    if ms = "" then
+      term := cs;
+    elif cs = "1" then
+      term := ms;
+    elif cs = "-1" then
+      term := Concatenation("-", ms);
+    else
+      term := Concatenation(cs, "*", ms);
+    fi;
+    if first then
+      Print(term);
+      first := false;
+    elif Length(term) >= 1 and term[1] = '-' then
+      Print(" - ", term{[2..Length(term)]});
+    else
+      Print(" + ", term);
+    fi;
+  od;
+end;
 
-# Pre-reduce complex relations modulo invertibility.
-# The four invertibility relations already form a Grobner basis on their own
-# (their leading monomials don't overlap; all S-polys reduce to zero), so we can
-# use them directly in StrongNormalFormNP without an SGrobner call. Reducing
-# kills x_i*y_i and y_i*x_i instances.
-inv_GB := GP2NPList(inv_relations);
-complex_np := GP2NPList(complex_relations);
-complex_simplified := List(complex_np, p -> StrongNormalFormNP(p, inv_GB));
-# Drop any that reduced to zero (would mean the relation was already implied
-# by invertibility alone — shouldn't happen here, but we do it conservatively).
-complex_simplified := Filtered(complex_simplified, p -> p <> []);
+print_labeled := function(label, np_list)
+  local r;
+  if Length(np_list) = 0 then return; fi;
+  Print("  [", label, "]\n");
+  for r in np_list do
+    Print("    ");
+    pretty_print_np(r);
+    Print("\n");
+  od;
+end;
 
-# Display the input we're about to feed SGrobner.
-relations := Concatenation(inv_relations, basic_relations, complex_relations);
-Print("Original relations (GAP):\n");
-for r in relations do Print(r, "\n"); od;
-Print("Simplified complex relations (post-reduction mod invertibility):\n");
-for p in complex_simplified do Print(NP2GP(p, F), "\n"); od;
+Print("Input relations (in q, t, s, (1-q)):\n");
+print_labeled("invertibility", GP2NPList(sym_rels.inv));
+print_labeled("braid",         GP2NPList(sym_rels.braid));
+print_labeled("zipper",        GP2NPList(sym_rels.zipper));
+print_labeled("untwisting",    GP2NPList(sym_rels.untwisting));
+Print("Simplified zipper / untwisting relations ",
+      "(post-reduction mod invertibility):\n");
+print_labeled("zipper",     sym_zipper_simpl);
+print_labeled("untwisting", sym_untwisting_simpl);
+
+###############################################################################
+# END AUXILIARY II, START GROBNER CALCULATION
+###############################################################################
 
 I := Concatenation(inv_GB,
-                   GP2NPList(basic_relations),
-                   complex_simplified);
-Print("Total input relations: ", Length(I), "\n");
+                   GP2NPList(braid_relations),
+                   zipper_simplified,
+                   untwisting_simplified);
+Print("Total input relations: ", Length(I), "\n\n");
 
 # Run SGrobnerTrace or SGrobner depending on the user parameter `traced`.
 if traced then
@@ -224,12 +436,15 @@ else
         "Beginning SGrobner calculation (no trace).\n");
   B := SGrobner(I);
 fi;
-Print("Groebner basis size: ", Length(B), "\n");
+
+# NOTE: Add a human-readable print of the grobner basis here.
+Print("Groebner basis size: ", Length(B), "\n\n");
 
 # Save the result to a parameter-tagged file.
-outFile := Concatenation("logs_and_traces/grobner_", out_str,
-                          "_zipper-", String(n), "-(", pStr, ")-",
-                          String(Int(q)), "-", String(Int(t)), ".gap");
+outFile := Concatenation("logs_and_traces/grobner_zipper_",
+                          untwisting_type, "-", out_str, "-",
+                          String(n), "-(", pStr, ")-",
+                          params_str, ".gap");
 if traced then
   PrintTo(outFile,
     "# Saved traced Grobner basis and parameters from zipper.gap.\n",
@@ -257,20 +472,26 @@ else
     "B := ", B, ";\n");
 fi;
 
+###############################################################################
+# END GROBNER CALCULATION, START DIMENSION ANALYSIS
+###############################################################################
+
 # Determination of dimension of quotient algebra
+# First we determine the rate of growth of homogeneous subspaces
 # Only leading monomials are required for determining dimension.
 L := LMonsNP(B);   # leading monomials
 nGen := 2*(n-1);   # number of generators of the free algebra (xs and ys)
 growth := DetermineGrowthQA(L, nGen, true);
+# Print quotient algebra betti number growth
 if growth=0 then
-  Print("The quotient algebra is finite-dimensional.\n",
-  "The Gel'fand-Kirillov dimension is: ", growth, "\n");
+  Print("The quotient algebra by the ideal is finite-dimensional.\n",
+  "Its Gel'fand-Kirillov dimension is: ", growth, "\n");
 elif not IsString(growth) then
   Print("The quotient algebra is infinite-dimensional of polynomial growth.\n",
-  "The Gel'fand-Kirillov dimension is: ", growth, "\n");
+  "Its Gel'fand-Kirillov dimension is: ", growth, "\n");
 else 
   Print("The quotient algebra is infinite-dimensional of exponential growth.\n",
-  "The Gel'fand-Kirillov dimension is infinite.\n");
+  "Its Gel'fand-Kirillov dimension is infinite.\n");
 fi;
 
 # HilbertSeriesQA(Lm, t, d): values of the Hilbert series up to degree d
@@ -279,8 +500,15 @@ dMax := n*(n-1);
 hilb := HilbertSeriesQA(L, nGen, dMax);
 hilb_deg := Length(hilb);
 dims := List([1..hilb_deg], i -> Sum(hilb{[1..i]}));
+
+# Print Hilbert series result
 Print("Hilbert series (degree 0,...,", hilb_deg-1, "): ", hilb, "\n");
-Print("Cumulative dims: ", dims, "\n");
-Print("Quotient algebra dimension DimQA(B, ",nGen,") = ", DimQA(B, nGen), "\n");
-Print("Compare: dim BMW_", n, " = (2n-1)!! = ",
+Print("Cumulative dims: ", dims, "\n\n");
+
+if growth=0 then
+  Print("Computing quotient dimension.\n");
+  dimQA := DimQA(B, nGen);
+  Print("Quotient algebra dimension DimQA(B, ",nGen,") = ", dimQA, "\n");
+  Print("Compare: dim BMW_", n, " = (2n-1)!! = ",
       Product([1, 3..2*n-1]), "\n");
+fi;
