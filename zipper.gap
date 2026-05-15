@@ -13,7 +13,7 @@ SetRecursionTrapInterval(50000);
 # from the braid-GAP/ directory.
 #
 # Number of strands.
-n := 3;
+n := 4;
 
 # The "true" coefficient ring is the function field Q(q,t), but rational
 # arithmetic is too expensive; specializing to GF(p) at chosen integer values is
@@ -33,9 +33,11 @@ t_int := 7;
 #                      the i-strand eigenvalue is s^(i-1) where
 #                      s = s_int*One(R) is an independent parameter. The
 #                      s_int parameter below is used only in this case.
+#   "silly_question" - Bigelow's i-strand relation, but the 2-strand relation
+#                      is weakened to (xs[j]^2 - t^2)X_2 (eigenvalue +/- t).
 #   "none"           - Omit the untwisting relations entirely. Quotient may
 #                      potentially be infinite-dimensional in this case.
-untwisting_type := "bigelow";
+untwisting_type := "silly_question";
 s_int := 11;
 
 # Below is a parameter that determines whether to compute the full trace
@@ -52,9 +54,11 @@ traced := false;
 ###############################################################################
 
 # Validate untwisting_type and throw error if invalid.
-if not (untwisting_type in [ "bigelow", "indeterminate", "none" ]) then
+if not (untwisting_type in
+        [ "bigelow", "indeterminate", "silly_question", "none" ]) then
   Error("invalid untwisting_type: \"", untwisting_type,
-        "\" (expected \"bigelow\", \"indeterminate\", or \"none\")");
+        "\" (expected \"bigelow\", \"indeterminate\", \"silly question\", ",
+        "or \"none\")");
 fi;
 
 # Set control flow for traced/untraced computation
@@ -216,14 +220,20 @@ build_relations := function(one_, xs_, ys_, q_, t_, s_, untw)
   # Add untwisting relations -- behavior controlled by untw.
   if untw <> "none" then
 
-    # Untwisting relations for 2-strand sliders.
+    # Untwisting relations for 2-strand sliders. "silly_question" weakens the
+    # eigenvalue to +/- t (degree 2 in xs[j]); the others fix it at t.
     for j in [1..n_-1] do
-      Add(untwisting, (xs_[j] - t_*one_) * S[2][j]);
+      if untw = "silly_question" then
+        Add(untwisting, (xs_[j]^2 - t_^2*one_) * S[2][j]);
+      else
+        Add(untwisting, (xs_[j] - t_*one_) * S[2][j]);
+      fi;
     od;
 
     # Untwisting relations for 3 or more strand sliders.
     # An i-strand slider anchored at strand index j requires strands
     # j, j+1, ..., j+i-2, so j ranges [1..n-i+1].
+    # "indeterminate" uses s^(i-1); the others use q^(i-1).
     for i in [3..n_] do
       for j in [1..n_-i+1] do
         xProd_reverse := xs_[j+i-2];
@@ -232,10 +242,10 @@ build_relations := function(one_, xs_, ys_, q_, t_, s_, untw)
           xProd_reverse := xProd_reverse * xs_[j+i-1-k];
           yProd_reverse := yProd_reverse * ys_[j+i-1-k];
         od;
-        if untw = "bigelow" then
-          Add(untwisting, (xProd_reverse - q_^(i-1)*yProd_reverse) * S[i][j]);
-        else  # indeterminate
+        if untw = "indeterminate" then
           Add(untwisting, (xProd_reverse - s_^(i-1)*yProd_reverse) * S[i][j]);
+        else  # bigelow or silly question
+          Add(untwisting, (xProd_reverse - q_^(i-1)*yProd_reverse) * S[i][j]);
         fi;
       od;
     od;
@@ -503,7 +513,7 @@ dims := List([1..hilb_deg], i -> Sum(hilb{[1..i]}));
 
 # Print Hilbert series result
 Print("Hilbert series (degree 0,...,", hilb_deg-1, "): ", hilb, "\n");
-Print("Cumulative dims: ", dims, "\n\n");
+Print("Cumulative dims: ", dims, "\n");
 
 if growth=0 then
   Print("Computing quotient dimension.\n");
